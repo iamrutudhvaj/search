@@ -43,37 +43,65 @@ class _HomePageState extends State<HomePage> {
 class DataSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) {
-    return [IconButton(icon: Icon(Icons.arrow_back), onPressed: () {})];
+    return [
+      IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            query = "";
+          })
+    ];
   }
 
   @override
   Widget buildLeading(BuildContext context) {
-    IconButton(icon: Icon(Icons.close), onPressed: () {});
-    throw UnimplementedError();
+    return IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          close(context, null);
+        });
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    throw UnimplementedError();
+    return Center(
+      child: Text(
+        query,
+        style: TextStyle(fontSize: 30),
+      ),
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final myList = loadFoodItem();
-    return ListView.builder(
-      itemCount: myList.length,
-      itemBuilder: (context, index) {
-        final FoodItem listItem = myList[index];
-        return ListTile(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(listItem.title),
-              Text(listItem.category),
-            ],
-          ),
-        );
-      },
-    );
+    final myList = query.isEmpty
+        ? loadFoodItem()
+        : loadFoodItem().where((p) => p.title.contains(query)).toList();
+
+    return myList.isEmpty
+        ? Center(
+            child: Text(
+              "No result found...",
+              style: TextStyle(fontSize: 25),
+            ),
+          )
+        : ListView.builder(
+            itemCount: myList.length,
+            itemBuilder: (context, index) {
+              final FoodItem listItem = myList[index];
+              return ListTile(
+                onTap: () {
+                  showResults(context);
+                },
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(listItem.title),
+                    Text(listItem.category),
+                    Divider(),
+                  ],
+                ),
+              );
+            },
+          );
   }
 }
